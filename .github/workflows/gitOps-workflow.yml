@@ -48,7 +48,7 @@ jobs:
         # Configures Git and commits the updated deployment manifest
         git config user.name "GitHub Actions Bot"
         git config user.email "<>"
-        git add ${{ env.APP_PATH }}/deployment.yaml
+        git add ${{ env.APP_PATH }}/custom-app.yaml
         git commit -m "Update image version in deployment manifest"
         git push 
 
