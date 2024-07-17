@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: custom-app
-        image: nginx    
+        image: acr0mrze3devu4j05bla9m4c.azurecr.io/custom-app:1
         ports:
         - containerPort: 80
 
