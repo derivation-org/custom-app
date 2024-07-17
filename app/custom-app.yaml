@@ -1,0 +1,61 @@
+# creating k8s the deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      custom: app
+  template:
+    metadata:
+      labels:
+        custom: app
+    spec:
+      containers:
+      - name: custom-app
+        image: nginx    
+        ports:
+        - containerPort: 80
+
+---
+# exposing the deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: custom-app-service
+spec:
+  selector:
+    custom: app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+
+---
+# Ingress resource for routing external traffic to the custom-app-service
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: custom-app-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt    
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: custom-app.derivation.space
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: custom-app-service
+                port: 
+                  number: 80
+  tls:
+  - hosts:
+    - custom-app.derivation.space
+    secretName: custom-app-ssl-secret  

@@ -1,0 +1,64 @@
+name: App Deploy GitOps
+
+on:
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+permissions:
+  contents: write  # Grants write access to repository contents
+
+env:
+  APP_NAME: ${{ vars.APP_NAME }}  # Name of the application
+  APP_PATH: ${{ vars.APP_PATH }}  # Path to the application in the repository
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4  
+    
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3  # Setting up QEMU for multi-architecture builds
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3  # Setting up Docker Buildx for efficient, multi-platform builds
+    
+    - name: Log into Azure Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.ACR_NAME }}.azurecr.io
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+    
+    - name: Build and push image to ACR
+      uses: docker/build-push-action@v5
+      with:
+        context: ${{ env.APP_PATH }}
+        push: true
+        platforms: linux/amd64,linux/arm64  # Builds for both AMD64 and ARM64 architectures
+        tags: ${{ env.ACR_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.run_number }}
+    
+    - name: Update Kubernetes manifest
+      run: |
+        # Updates the image version in the deployment manifest
+        sed -i 's|image: .*|image: ${{ env.ACR_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.run_number }}|' ${{ env.APP_PATH }}/deployment.yaml
+    
+    - name: Commit and push changes
+      run: |
+        # Configures Git and commits the updated deployment manifest
+        git config user.name "GitHub Actions Bot"
+        git config user.email "<>"
+        git add ${{ env.APP_PATH }}/deployment.yaml
+        git commit -m "Update image version in deployment manifest"
+        git push
+
+# Required variables and secrets:
+# 
+# Variables to be created:
+# - APP_NAME: The name of your application
+# - APP_PATH: The path to your application in the repository
+# - ACR_NAME: The name of your Azure Container Registry
+#
+# Secrets to be created:
+# - ACR_USERNAME: The username for your Azure Container Registry
+# - ACR_PASSWORD: The password for your Azure Container Registry
