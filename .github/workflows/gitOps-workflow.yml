@@ -1,4 +1,4 @@
-name: App Deploy GitOps
+name: GitOps Workflow
 
 on:
   workflow_dispatch:  # Allows manual triggering of the workflow
@@ -36,12 +36,12 @@ jobs:
         context: ${{ env.APP_PATH }}
         push: true
         platforms: linux/amd64,linux/arm64  # Builds for both AMD64 and ARM64 architectures
-        tags: ${{ env.ACR_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.run_number }}
+        tags: ${{ secrets.ACR_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.run_number }}
     
     - name: Update Kubernetes manifest
       run: |
         # Updates the image version in the deployment manifest
-        sed -i 's|image: .*|image: ${{ env.ACR_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.run_number }}|' ${{ env.APP_PATH }}/deployment.yaml
+        sed -i 's|image: .*|image: ${{ secrets.ACR_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.run_number }}|' ${{ env.APP_PATH }}/deployment.yaml
     
     - name: Commit and push changes
       run: |
@@ -50,15 +50,15 @@ jobs:
         git config user.email "<>"
         git add ${{ env.APP_PATH }}/deployment.yaml
         git commit -m "Update image version in deployment manifest"
-        git push
+        git push 
 
 # Required variables and secrets:
 # 
 # Variables to be created:
 # - APP_NAME: The name of your application
 # - APP_PATH: The path to your application in the repository
-# - ACR_NAME: The name of your Azure Container Registry
 #
 # Secrets to be created:
+# - ACR_NAME: The name of your Azure Container Registry
 # - ACR_USERNAME: The username for your Azure Container Registry
 # - ACR_PASSWORD: The password for your Azure Container Registry
