@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: custom-app
-        image: acr05gumd5o3bjp2.azurecr.io/custom-app:5
+        image: acr0rb9ckmr76a6p.azurecr.io/custom-app:6
         ports:
         - containerPort: 80
 
