@@ -1,17 +1,17 @@
 name: GitOps Workflow
 
-env:
-  APP_NAME: ${{ vars.APP_NAME }}  # Name of the application
-  APP_PATH: ${{ vars.APP_PATH }}  # Path to the application in the repository
-
 on:
   push:
     paths:
-      - '${{ env.APP_PATH }}/index.html'
+      - '*/index.html'
   
 permissions:
   contents: write  # Grants write access to repository contents
-
+  
+env:
+  APP_NAME: ${{ vars.APP_NAME }}  # Name of the application
+  APP_PATH: ${{ vars.APP_PATH }}  # Path to the application in the repository
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
