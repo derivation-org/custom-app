@@ -6,9 +6,8 @@ env:
 
 on:
   push:
-    branches: [main]
     paths:
-      - '${{ env.APP_PATH }}/index.html' # Triggers on pushes to the index.html on the main branch 
+      - 'custom-app/index.html'
 
 permissions:
   contents: write  # Grants write access to repository contents
