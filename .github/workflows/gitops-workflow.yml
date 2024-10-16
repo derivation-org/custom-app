@@ -1,7 +1,9 @@
 name: GitOps Workflow
 
 on:
-  workflow_dispatch:  # Allows manual triggering of the workflow
+  push:
+    paths:
+      - 'app/index.html'
   
 permissions:
   contents: write  # Grants write access to repository contents
