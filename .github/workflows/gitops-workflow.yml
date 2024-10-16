@@ -3,7 +3,7 @@ name: GitOps Workflow
 on:
   push:
     paths:
-      - '*/index.html'
+      - '*/index.html' # Triggers on pushes to the index.html
   
 permissions:
   contents: write  # Grants write access to repository contents
