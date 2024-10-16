@@ -1,16 +1,16 @@
 name: GitOps Workflow
 
-on:
-  push:
-    paths:
-      - 'app/index.html'
-  
-permissions:
-  contents: write  # Grants write access to repository contents
-  
 env:
   APP_NAME: ${{ vars.APP_NAME }}  # Name of the application
   APP_PATH: ${{ vars.APP_PATH }}  # Path to the application in the repository
+
+on:
+  push:
+    paths:
+      - '${{ env.APP_PATH }}/index.html'
+  
+permissions:
+  contents: write  # Grants write access to repository contents
 
 jobs:
   deploy:
