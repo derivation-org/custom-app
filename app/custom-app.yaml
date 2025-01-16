@@ -59,3 +59,30 @@ spec:
   - hosts:
     - custom-app.derivation.space
     secretName: custom-app-ssl-secret  
+
+# Secures 'custom-app' by allowing traffic from the Ingress controller and between pods.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: custom-app-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      custom: app
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 80
+    - from:
+      - podSelector:
+          matchLabels:
+            custom: app
+      ports:
+        - protocol: TCP
+          port: 80
